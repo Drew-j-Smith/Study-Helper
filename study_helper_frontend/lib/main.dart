@@ -108,39 +108,53 @@ class _AssignmentPageState extends State<AssignmentPage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Center(
-            child: Container(),
-          ),
-          TextButton(
-            onPressed: () {
-              final task = Assignment(
-                  name: 'test',
-                  course: 'test',
-                  date: DateTime.now(),
-                  type: 'test');
-
-              addAndStoreAssignment(task);
+      body: ListView.builder(
+          itemCount: _assignments.length,
+          itemBuilder: (context, index) {
+            final item = AssignmentListItem(_assignments[index]);
+            return ListTile(
+              title: item.buildTitle(context),
+              subtitle: item.buildSubtitle(context),
+            );
+          }),
+      drawer: Drawer(
+        child: ListView(padding: EdgeInsets.zero, children: [
+          const DrawerHeader(
+              decoration: BoxDecoration(color: Colors.purple),
+              child: Center(
+                  child: Text('Study Helper',
+                      style: TextStyle(fontSize: 40, color: Colors.white)))),
+          ListTile(
+            title: const Text('Homework'),
+            onTap: () {
+              Navigator.pop(context);
             },
-            child: Text('Add Assignments'),
           ),
-          TextButton(
-            onPressed: () {
-              clearAssignments();
-            },
-            child: Text('Clear Assignments'),
-          ),
-        ],
+          ListTile(
+              title: const Text('Login'),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const LoginPage(title: 'Login')));
+              }),
+          ListTile(
+              title: const Text('Create Account'),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            const CreateAccountPage(title: 'Create Account')));
+              }),
+        ]),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      const CreateAccountPage(title: 'Create Account')));
+          final task = Assignment(
+              name: 'test', course: 'test', date: DateTime.now(), type: 'test');
+
+          addAndStoreAssignment(task);
         },
         tooltip: 'Add Homework',
         child: const Icon(Icons.add),
@@ -161,8 +175,6 @@ class Assignment {
   final String name;
   final String course;
   final String type;
-
-  final DateFormat formatter = DateFormat('MM-dd-yy');
   final DateTime date;
 
   Assignment(
@@ -170,4 +182,16 @@ class Assignment {
       required this.course,
       required this.date,
       required this.type});
+}
+
+class AssignmentListItem {
+  Assignment item;
+  final DateFormat formatter = DateFormat('MM-dd-yy');
+
+  AssignmentListItem(this.item);
+
+  Widget buildTitle(BuildContext context) => Text(item.name);
+
+  Widget buildSubtitle(BuildContext context) =>
+      Text(item.course + " " + item.type + " " + formatter.format(item.date));
 }
