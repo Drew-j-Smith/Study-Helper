@@ -12,6 +12,10 @@ Create Database
 
 `CREATE DATABASE StudyHelperDatabase;`
 
+Create Table
+
+`CREATE TABLE StudyHelperUsers (email TEXT, hash VARCHAR(16), salt VARCHAR(16), data TEXT);`
+
 ## Installing python packages
 
 dotenv
