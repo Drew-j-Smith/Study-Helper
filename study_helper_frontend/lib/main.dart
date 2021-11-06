@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'login.dart';
 import 'create_account.dart';
+import 'create_assignment.dart';
 import 'package:get_storage/get_storage.dart';
 
 void main() async {
@@ -36,9 +37,7 @@ class AssignmentPage extends StatefulWidget {
 }
 
 class _AssignmentPageState extends State<AssignmentPage> {
-  List<Assignment> _assignments = [
-    Assignment(name: 'test', course: 'test', date: DateTime.now(), type: 'test')
-  ];
+  List<Assignment> _assignments = [];
 
   final box = GetStorage(); // list of maps stored here
 
@@ -56,37 +55,37 @@ class _AssignmentPageState extends State<AssignmentPage> {
 
     storageMap[nameKey] = assignment.name;
     storageMap[courseKey] = assignment.course;
-    storageMap[dateKey] = assignment.date;
+    storageMap[dateKey] = DateFormat('yyyy-MM-dd').format(assignment.date);
     storageMap[typeKey] = assignment.type;
 
     storageList.add(storageMap);
+
     box.write('assignments', storageList);
   }
 
   void restoreAssignments() {
     if (box.hasData('assignments')) {
       storageList = box.read('assignments');
-      String nameKey, courseKey, dateKey, typeKey;
+    }
+    String nameKey, courseKey, dateKey, typeKey;
+    for (int i = 0; i < storageList.length; i++) {
+      final map = storageList[i];
+      final index = i + 1;
 
-      for (int i = 0; i < storageList.length; i++) {
-        final map = storageList[i];
-        final index = i + 1;
+      nameKey = 'name$index';
+      courseKey = 'course$index';
+      dateKey = 'date$index';
+      typeKey = 'type$index';
 
-        nameKey = 'name$index';
-        courseKey = 'course$index';
-        dateKey = 'date$index';
-        typeKey = 'type$index';
+      // recreate assignment object
 
-        // recreate assignment object
+      final assignment = Assignment(
+          name: map[nameKey],
+          course: map[courseKey],
+          date: DateFormat('yyyy-MM-dd').parse(map[dateKey]),
+          type: map[typeKey]);
 
-        final assignment = Assignment(
-            name: map[nameKey],
-            course: map[courseKey],
-            date: map[dateKey],
-            type: map[typeKey]);
-
-        _assignments.add(assignment);
-      }
+      _assignments.add(assignment);
     }
   }
 
@@ -151,10 +150,15 @@ class _AssignmentPageState extends State<AssignmentPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          final task = Assignment(
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      const CreateAssignmentPage(title: 'Add Assignment')));
+          final assignment = Assignment(
               name: 'test', course: 'test', date: DateTime.now(), type: 'test');
-
-          addAndStoreAssignment(task);
+          addAndStoreAssignment(assignment);
+          setState(() {});
         },
         tooltip: 'Add Homework',
         child: const Icon(Icons.add),
