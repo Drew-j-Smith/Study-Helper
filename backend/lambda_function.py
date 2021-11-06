@@ -39,7 +39,6 @@ def post(event):
     res = {}
     body = json.loads(event["body"])
     if "email" not in body:
-        cnx.close()
         return error("Must supply email")
     
     cnx = sql_server_interface.connect()
@@ -57,10 +56,10 @@ def post(event):
         
         # test for updates
         for field in ["email", "hash", "salt", "data"]:
-            if field in body and body[field] != info[body]:
+            if field in body and body[field] != info[field]:
                 sql_server_interface.updateInfo(cnx, body[email], field, body[field])
 
-        res = info
+        res = sql_server_interface.getInfo(cnx, body["email"])
     else:
         # resturn salt
         res = { "salt": info["salt"] }
@@ -68,14 +67,32 @@ def post(event):
     cnx.close()
     return {
         "statusCode": 200,
-        "body": res
+        "body": json.dumps(res)
     }
 
 def delete(event):
     body = json.loads(event["body"])
+    if "email" not in body or "hash" not in body:
+        return error("Must supply email and hash")
+    
+    cnx = sql_server_interface.connect()
+    info = sql_server_interface.getInfo(cnx, body["email"])
+
+    if not info:
+        cnx.close()
+        return error("User does not exist")
+    
+    # validate
+    if not compare_digest(body["hash"], info["hash"]):
+        cnx.close()
+        return error("Invalid password")
+
+    res = sql_server_interface.deleteUser(cnx, body["email"])
+
+    cnx.close()
     return {
         "statusCode": 200,
-        "body": json.dumps([method, body])
+        "body": "success"
     }
 
 def error(msg):
