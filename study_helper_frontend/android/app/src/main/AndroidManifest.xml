@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.study_helper_frontend">
+    <uses-permission android:name="android.permission.INTERNET"/>
    <application
         android:label="study_helper_frontend"
         android:icon="@mipmap/ic_launcher">

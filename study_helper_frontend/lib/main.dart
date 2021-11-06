@@ -1,138 +1,154 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'login.dart';
+import 'create_account.dart';
+import 'package:get_storage/get_storage.dart';
 
-void main() {
-  runApp(MyApp(
-    items: List<ListItem>.generate(1000, (i) {
-      return AssignmentItem(
-          "Assignment $i", "Course", DateTime.now(), "Homework");
-    }),
-  ));
+void main() async {
+  await GetStorage.init();
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final List<ListItem> items;
+  const MyApp({Key? key}) : super(key: key);
 
-  const MyApp({Key? key, required this.items}) : super(key: key);
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Study Helper',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.purple,
       ),
-      home: MyHomePage(
-        title: 'Homework',
-        items: items,
-      ),
+      home: const AssignmentPage(title: 'Homework'),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title, required this.items})
-      : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
+class AssignmentPage extends StatefulWidget {
+  const AssignmentPage({Key? key, required this.title}) : super(key: key);
 
   final String title;
-  final List<ListItem> items;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<AssignmentPage> createState() => _AssignmentPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _AssignmentPageState extends State<AssignmentPage> {
+  List<Assignment> _assignments = [
+    Assignment(name: 'test', course: 'test', date: DateTime.now(), type: 'test')
+  ];
+
+  final box = GetStorage(); // list of maps stored here
+
+  List storageList = [];
+
+  void addAndStoreAssignment(Assignment assignment) {
+    _assignments.add(assignment);
+
+    final storageMap = {}; // temp map
+    final index = _assignments.length; // unique map keys
+    final nameKey = 'name$index';
+    final courseKey = 'course$index';
+    final dateKey = 'date$index';
+    final typeKey = 'type$index';
+
+    storageMap[nameKey] = assignment.name;
+    storageMap[courseKey] = assignment.course;
+    storageMap[dateKey] = assignment.date;
+    storageMap[typeKey] = assignment.type;
+
+    storageList.add(storageMap);
+    box.write('assignments', storageList);
+  }
+
+  void restoreAssignments() {
+    if (box.hasData('assignments')) {
+      storageList = box.read('assignments');
+      String nameKey, courseKey, dateKey, typeKey;
+
+      for (int i = 0; i < storageList.length; i++) {
+        final map = storageList[i];
+        final index = i + 1;
+
+        nameKey = 'name$index';
+        courseKey = 'course$index';
+        dateKey = 'date$index';
+        typeKey = 'type$index';
+
+        // recreate assignment object
+
+        final assignment = Assignment(
+            name: map[nameKey],
+            course: map[courseKey],
+            date: map[dateKey],
+            type: map[typeKey]);
+
+        _assignments.add(assignment);
+      }
+    }
+  }
+
+  void clearAssignments() {
+    _assignments.clear();
+    storageList.clear();
+    box.erase();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    restoreAssignments();
+  }
+
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: ListView.builder(
-        itemCount: widget.items.length,
-        itemBuilder: (context, index) {
-          final item = widget.items[index];
-          return ListTile(
-            title: item.buildTitle(context),
-            subtitle: item.buildSubtitle(context),
-          );
-        },
-      ),
-      /*Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have clicked the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),*/
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Center(
+            child: Container(),
+          ),
+          TextButton(
+            onPressed: () {
+              final task = Assignment(
+                  name: 'test',
+                  course: 'test',
+                  date: DateTime.now(),
+                  type: 'test');
 
+              addAndStoreAssignment(task);
+            },
+            child: Text('Add Assignments'),
+          ),
+          TextButton(
+            onPressed: () {
+              clearAssignments();
+            },
+            child: Text('Clear Assignments'),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => const LoginPage(title: 'Login')));
+                  builder: (context) =>
+                      const CreateAccountPage(title: 'Create Account')));
         },
         tooltip: 'Add Homework',
         child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }
 
-// base class for types of items in the list
 abstract class ListItem {
   // title line for list item
   Widget buildTitle(BuildContext context);
@@ -141,24 +157,17 @@ abstract class ListItem {
   Widget buildSubtitle(BuildContext context);
 }
 
-class AssignmentItem implements ListItem {
+class Assignment {
   final String name;
   final String course;
   final String type;
 
-  final DateFormat formatter = DateFormat('mm-dd-yy');
+  final DateFormat formatter = DateFormat('MM-dd-yy');
   final DateTime date;
 
-  AssignmentItem(this.name, this.course, this.date, this.type);
-
-  @override
-  Widget buildTitle(BuildContext context) => Text(name);
-
-  @override
-  Widget buildSubtitle(BuildContext context) =>
-      Text(course + " " + type + " " + formatter.format(date));
+  Assignment(
+      {required this.name,
+      required this.course,
+      required this.date,
+      required this.type});
 }
-// idea for later object for courses - color, schedule, etc
-/*abstract class courseObject {
-  Widget buildTitle(BuildContext context);
-}*/
