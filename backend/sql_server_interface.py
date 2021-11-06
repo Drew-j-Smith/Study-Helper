@@ -14,7 +14,7 @@ def getInfo(cnx, email):
 
     res = None
     for (hash, salt, data) in cursor:
-        res = (hash, salt, data)
+        res = {"email": email, "hash": hash, "salt": salt, "data": data}
 
     cursor.close()
     return res    
@@ -23,7 +23,7 @@ def getInfo(cnx, email):
 def updateInfo(cnx, email, field, newValue):
     # make sure exists
     if not getInfo(cnx, email):
-        return False;
+        return False
 
     cursor = cnx.cursor()
     cursor.execute(f"UPDATE StudyHelperUsers SET {field} = \"{newValue}\" "
@@ -35,7 +35,7 @@ def updateInfo(cnx, email, field, newValue):
 def deleteUser(cnx, email):
     # make sure exists
     if not getInfo(cnx, email):
-        return False;
+        return False
     
     cursor = cnx.cursor()
     cursor.execute(f"DELETE FROM StudyHelperUsers WHERE email = \"{email}\";")
@@ -46,7 +46,7 @@ def deleteUser(cnx, email):
 def createUser(cnx, email, hash, salt, data):
     # make sure doesn't exist
     if getInfo(cnx, email):
-        return False;
+        return False
 
     cursor = cnx.cursor()
     cursor.execute("INSERT INTO StudyHelperUsers (email, hash, salt, data) "

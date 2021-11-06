@@ -14,7 +14,7 @@ Create Database
 
 Create Table
 
-`CREATE TABLE StudyHelperUsers (email TEXT, hash VARCHAR(16), salt VARCHAR(16), data TEXT);`
+`CREATE TABLE StudyHelperUsers (email TEXT, hash VARCHAR(43), salt VARCHAR(16), data TEXT);`
 
 ## Installing python packages
 
