@@ -10,7 +10,7 @@ def connect():
 def getInfo(cnx, email):
     cursor = cnx.cursor()
     cursor.execute("SELECT hash, salt, data FROM StudyHelperUsers "
-                    f"WHERE email = \"{email}\";")
+                    "WHERE email = %s", (email,))
 
     res = None
     for (hash, salt, data) in cursor:
@@ -20,14 +20,16 @@ def getInfo(cnx, email):
     return res    
     
 
-def updateInfo(cnx, email, field, newValue):
+def updateInfo(cnx, email, hash, salt, data):
     # make sure exists
     if not getInfo(cnx, email):
         return False
 
     cursor = cnx.cursor()
-    cursor.execute(f"UPDATE StudyHelperUsers SET {field} = \"{newValue}\" "
-                    f"WHERE email = \"{email}\";")
+    cursor.execute("UPDATE StudyHelperUsers SET hash = %s WHERE email = %s;", (hash, email))
+    cursor.execute("UPDATE StudyHelperUsers SET salt = %s WHERE email = %s;", (salt, email))
+    cursor.execute("UPDATE StudyHelperUsers SET data = %s WHERE email = %s;", (data, email))
+    cursor.execute("UPDATE StudyHelperUsers SET email = %s WHERE email = %s;", (email, email))
     cnx.commit()
     cursor.close()
     return True
@@ -38,7 +40,7 @@ def deleteUser(cnx, email):
         return False
     
     cursor = cnx.cursor()
-    cursor.execute(f"DELETE FROM StudyHelperUsers WHERE email = \"{email}\";")
+    cursor.execute("DELETE FROM StudyHelperUsers WHERE email = %s", (email,))
     cnx.commit()
     cursor.close()
     return True
@@ -50,7 +52,7 @@ def createUser(cnx, email, hash, salt, data):
 
     cursor = cnx.cursor()
     cursor.execute("INSERT INTO StudyHelperUsers (email, hash, salt, data) "
-                f"VALUES (\"{email}\", \"{hash}\", \"{salt}\", \"{data}\");")
+                "VALUES (%s, %s, %s, %s);", (email, hash, salt, data))
     cnx.commit()
     cursor.close()
     return True
@@ -61,6 +63,6 @@ def createUser(cnx, email, hash, salt, data):
 # print(createUser(cnx, "email", "hash", "salt", "data"))
 # print(getInfo(cnx, "email"))
 # print(createUser(cnx, "email", "hash", "salt", "data"))
-# print(updateInfo(cnx, "email", "hash", "hash2"))
+# print(updateInfo(cnx, "email", "hash2", "salt", "data"))
 # print(getInfo(cnx, "email"))
 # print(deleteUser(cnx, "email"))

@@ -54,10 +54,12 @@ def post(event):
             cnx.close()
             return error("Invalid password")
         
-        # test for updates
-        for field in ["email", "hash", "salt", "data"]:
-            if field in body and body[field] != info[field]:
-                sql_server_interface.updateInfo(cnx, body[email], field, body[field])
+        # update
+        sql_server_interface.updateInfo(cnx, 
+        body["newemail"] if "newemail" in body else body["email"], 
+        body["newhash"] if "newhash" in body else body["hash"],
+        body["salt"] if "salt" in body else info["salt"], 
+        body["data"] if "data" in body else info["data"])
 
         res = sql_server_interface.getInfo(cnx, body["email"])
     else:
@@ -100,3 +102,16 @@ def error(msg):
         "statusCode": 400,
         "body": msg
     }
+
+
+# example usage
+# print(requests.post("https://upqlg48wn7.execute-api.us-east-1.amazonaws.com/default/StudyHelperBacken", json={"email":"email","hash":"hash"}).content)
+# print(requests.put("https://upqlg48wn7.execute-api.us-east-1.amazonaws.com/default/StudyHelperBacken", json={"email":"email","hash":"hash","salt":"salt","data":"data"}).content)
+# print(requests.put("https://upqlg48wn7.execute-api.us-east-1.amazonaws.com/default/StudyHelperBacken", json={"email":"email","hash":"hash","salt":"salt","data":"data"}).content)
+# print(requests.put("https://upqlg48wn7.execute-api.us-east-1.amazonaws.com/default/StudyHelperBacken", json={"email":"email"}).content)
+# print(requests.post("https://upqlg48wn7.execute-api.us-east-1.amazonaws.com/default/StudyHelperBacken", json={"email":"email","hash":"hash"}).content)
+# print(requests.post("https://upqlg48wn7.execute-api.us-east-1.amazonaws.com/default/StudyHelperBacken", json={"email":"email","hash":"hash","salt":"salt2","data":"data2"}).content)
+# print(requests.post("https://upqlg48wn7.execute-api.us-east-1.amazonaws.com/default/StudyHelperBacken", json={"email":"email","hash":"hash"}).content)
+# print(requests.post("https://upqlg48wn7.execute-api.us-east-1.amazonaws.com/default/StudyHelperBacken", json={"email":"email","hash":"bad"}).content)
+# print(requests.delete("https://upqlg48wn7.execute-api.us-east-1.amazonaws.com/default/StudyHelperBacken", json={"email":"email","hash":"bad"}).content)
+# print(requests.delete("https://upqlg48wn7.execute-api.us-east-1.amazonaws.com/default/StudyHelperBacken", json={"email":"email","hash":"hash"}).content)
