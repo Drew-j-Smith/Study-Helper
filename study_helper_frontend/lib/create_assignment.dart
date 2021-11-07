@@ -37,7 +37,7 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
     super.dispose();
   }
 
-  String dropdownCourseValue = 'Select course.';
+  Course dropdownCourseValue = Course();
   String type = "";
   DateTime date = DateTime.now();
 
@@ -55,19 +55,14 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
                   return 'Assignment name can not be empty.';
                 }
               }),
-          DropdownButtonFormField<String>(
-              onChanged: (String? newValue) {
+          DropdownButtonFormField<Course>(
+              onChanged: (Course? newValue) {
                 setState(() {
                   dropdownCourseValue = newValue!;
                 });
               },
               // TODO - courses here
-              items: StaticApplicationData.data
-                  .getCourseList()
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                    value: value, child: Text(value));
-              }).toList(),
+              items: StaticApplicationData.data.getCourseList(),
               decoration: const InputDecoration(
                 border: UnderlineInputBorder(),
                 labelText: 'Course',
@@ -139,8 +134,7 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
           onPressed: () {
             Assignment assignment = Assignment(
                 name: nameController.text,
-                course:
-                    StaticApplicationData.data.findCourse(dropdownCourseValue)!,
+                course: dropdownCourseValue,
                 date: DateFormat('MM/dd/yyyy').parse(dateController.text),
                 type: type);
             StaticApplicationData.data.assignments.add(assignment);

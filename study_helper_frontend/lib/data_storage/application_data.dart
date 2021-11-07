@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+
 import 'assignment.dart';
 import 'course.dart';
 
@@ -47,20 +49,14 @@ class ApplicationData {
     });
   }
 
-  List<String> getCourseList() {
-    List<String> courseList = [];
+  List<DropdownMenuItem<Course>> getCourseList() {
+    List<DropdownMenuItem<Course>> items = [];
     for (Course c in courses) {
-      courseList.add(c.name);
+      items.add(DropdownMenuItem<Course>(
+        child: Text(c.name),
+        value: c,
+      ));
     }
-    return courseList;
-  }
-
-  Course? findCourse(String name) {
-    for (Course c in courses) {
-      if (c.name == name) {
-        return c;
-      }
-    }
-    return null;
+    return items;
   }
 }
