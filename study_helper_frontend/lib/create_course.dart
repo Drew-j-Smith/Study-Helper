@@ -1,10 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'course_list.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
 class CreateCoursePage extends StatefulWidget {
-  const CreateCoursePage({Key? key, required this.title}) : super(key: key);
+  List<Course> courses;
+  final Function update;
+
+  CreateCoursePage(
+      {Key? key,
+      required this.title,
+      required this.courses,
+      required this.update})
+      : super(key: key);
   final String title;
   @override
   _CreateCoursePageState createState() => _CreateCoursePageState();
@@ -12,16 +21,12 @@ class CreateCoursePage extends StatefulWidget {
 
 class _CreateCoursePageState extends State<CreateCoursePage> {
   // TODO - fix this stuff
-  final nameController = TextEditingController();
-  final courseController = TextEditingController();
-  final dateController = TextEditingController();
-  final typeController = TextEditingController();
+  final courseNameController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
-    nameController.dispose();
-    courseController.dispose();
+    courseNameController.dispose();
     super.dispose();
   }
 
@@ -45,6 +50,7 @@ class _CreateCoursePageState extends State<CreateCoursePage> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           TextFormField(
+                            controller: courseNameController,
                             autocorrect: false,
                             decoration: const InputDecoration(
                                 border: UnderlineInputBorder(),
@@ -57,6 +63,8 @@ class _CreateCoursePageState extends State<CreateCoursePage> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             // TODO - save actual course
+            Course course = Course(courseName: courseNameController.text);
+            widget.update(course);
             Navigator.pop(context);
           },
           tooltip: 'Add Course',

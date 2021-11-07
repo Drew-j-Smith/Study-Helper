@@ -1,31 +1,8 @@
-import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:crypt/crypt.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:http/http.dart' as http;
-
-Future<String> putRequest(
-    String email, String hash, String salt, String data) async {
-  http.Response response = await http.put(
-      Uri.parse(
-          'https://upqlg48wn7.execute-api.us-east-1.amazonaws.com/default/StudyHelperBacken'),
-      headers: {'Access-Control-Allow-Origin': '*'},
-      body: jsonEncode(<String, String>{
-        'email': email,
-        'hash': hash,
-        'salt': salt,
-        'data': 'pee',
-      }));
-  if (response.statusCode == 400) {
-    // error
-  } else if (response.statusCode == 201) {
-    // we good
-  } else {
-    // what
-  }
-  return "";
-}
+import 'web_calls.dart';
 
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({Key? key, required this.title}) : super(key: key);

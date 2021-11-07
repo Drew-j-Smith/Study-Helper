@@ -21,7 +21,7 @@ class _CourseListPageState extends State<CourseListPage> {
 
   List storageList = [];
 
-  void addAndStoreCourse(Course course) {
+  void storeAndAddCourse(Course course) {
     _courses.add(course);
 
     final storageMap = {}; // temp map
@@ -58,6 +58,11 @@ class _CourseListPageState extends State<CourseListPage> {
     _courses.clear();
     storageList.clear();
     box.erase();
+  }
+
+  void update(Course course) {
+    storeAndAddCourse(course);
+    setState(() {});
   }
 
   @override
@@ -123,10 +128,11 @@ class _CourseListPageState extends State<CourseListPage> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) =>
-                      const CreateCoursePage(title: 'Add Course')));
-          final course = Course(courseName: 'Course Test');
-          addAndStoreCourse(course);
+                  builder: (context) => CreateCoursePage(
+                        title: 'Add Course',
+                        courses: _courses,
+                        update: update,
+                      )));
           setState(() {});
         },
         tooltip: 'Add Course',
@@ -148,6 +154,11 @@ class Course {
   final String courseName;
 
   Course({required this.courseName});
+
+  @override
+  String toString() {
+    return courseName;
+  }
 }
 
 class CourseListItem {

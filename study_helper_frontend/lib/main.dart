@@ -39,12 +39,22 @@ class AssignmentPage extends StatefulWidget {
 
 class _AssignmentPageState extends State<AssignmentPage> {
   List<Assignment> _assignments = [];
+  List<Course> _courses = [];
+  DateTime lastEvent = DateTime.now();
 
   final box = GetStorage(); // list of maps stored here
 
   List storageList = [];
 
-  void addAndStoreAssignment(Assignment assignment) {
+  dynamic getState() {
+    return {
+      "assignments": _assignments,
+      "courses": _courses,
+      "last_update": lastEvent
+    };
+  }
+
+  void storeAndAddAssignment(Assignment assignment) {
     _assignments.add(assignment);
 
     final storageMap = {}; // temp map
@@ -94,6 +104,11 @@ class _AssignmentPageState extends State<AssignmentPage> {
     _assignments.clear();
     storageList.clear();
     box.erase();
+  }
+
+  void update(Assignment assignment) {
+    storeAndAddAssignment(assignment);
+    setState(() {});
   }
 
   @override
@@ -155,6 +170,7 @@ class _AssignmentPageState extends State<AssignmentPage> {
                         builder: (context) =>
                             const CreateAccountPage(title: 'Create Account')));
               }),
+          ListTile(title: const Text('Sync'), onTap: () {}),
         ]),
       ),
       floatingActionButton: FloatingActionButton(
@@ -162,11 +178,13 @@ class _AssignmentPageState extends State<AssignmentPage> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) =>
-                      const CreateAssignmentPage(title: 'Add Assignment')));
-          final assignment = Assignment(
-              name: 'test', course: 'test', date: DateTime.now(), type: 'test');
-          addAndStoreAssignment(assignment);
+                  builder: (context) => CreateAssignmentPage(
+                        title: 'Add Assignment',
+                        assignments: _assignments,
+                        courses: _courses,
+                        update: update,
+                        getState: getState,
+                      )));
           setState(() {});
         },
         tooltip: 'Add Assignment',

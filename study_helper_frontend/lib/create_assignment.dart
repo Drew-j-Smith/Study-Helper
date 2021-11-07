@@ -1,17 +1,34 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'main.dart';
+import 'course_list.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
 class CreateAssignmentPage extends StatefulWidget {
-  const CreateAssignmentPage({Key? key, required this.title}) : super(key: key);
+  List<Assignment> assignments;
+  List<Course> courses;
+
+  final Function update;
+  final Function getState;
+
+  CreateAssignmentPage(
+      {Key? key,
+      required this.title,
+      required this.assignments,
+      required this.courses,
+      required this.update,
+      required this.getState})
+      : super(key: key);
   final String title;
+
   @override
   _CreateAssignmentPageState createState() => _CreateAssignmentPageState();
 }
 
 class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
-  // TODO - fix this stuff
+  // TODO - fix this stuff=
+
   final nameController = TextEditingController();
   final courseController = TextEditingController();
   final dateController = TextEditingController();
@@ -26,9 +43,21 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
   }
 
   String dropdownCourseValue = 'Select course.';
+  String name = "", type = "", course = "";
+  DateTime date = DateTime.now();
+
+  List<String> populateCourses() {
+    List<String> courseNames = [];
+    for (Course item in widget.getState()["courses"]) {
+      courseNames.add(item.courseName);
+    }
+    return courseNames;
+  }
 
   @override
   Widget build(BuildContext context) {
+    List<String> coursesList = populateCourses();
+    debugPrint(widget.getState());
     return Scaffold(
         appBar: AppBar(title: Text(widget.title)),
         body: Center(
@@ -45,6 +74,7 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           TextFormField(
+                              controller: nameController,
                               autocorrect: false,
                               decoration: const InputDecoration(
                                   border: UnderlineInputBorder(),
@@ -61,10 +91,8 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
                                 });
                               },
                               // TODO - courses here
-                              items: <String>[
-                                'thing1',
-                                'thing2'
-                              ].map<DropdownMenuItem<String>>((String value) {
+                              items: coursesList.map<DropdownMenuItem<String>>(
+                                  (String value) {
                                 return DropdownMenuItem<String>(
                                     value: value, child: Text(value));
                               }).toList(),
@@ -75,6 +103,7 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
                           DropdownButtonFormField<String>(
                               onChanged: (String? newValue) {
                                 setState(() {
+                                  type = newValue.toString();
                                   dropdownCourseValue = newValue!;
                                 });
                               },
@@ -96,6 +125,7 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
                                 labelText: 'Type',
                               )),
                           DateTimeField(
+                            controller: dateController,
                             format: DateFormat('MM/dd/yyyy'),
                             decoration: const InputDecoration(
                               border: UnderlineInputBorder(),
@@ -109,6 +139,7 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
                                   lastDate: DateTime(2099));
                             },
                             validator: (DateTime? value) {
+                              date = DateTime.parse(value.toString());
                               if (value == null) {
                                 return 'Must enter date.';
                               }
@@ -137,6 +168,12 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             // TODO - actually save
+            Assignment assignment = Assignment(
+                name: nameController.text,
+                course: course,
+                date: DateFormat('MM/dd/yyyy').parse(dateController.text),
+                type: type);
+            widget.update(assignment);
             Navigator.pop(context);
           },
           tooltip: 'Add Assignment',

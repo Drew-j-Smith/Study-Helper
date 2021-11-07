@@ -4,28 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:crypt/crypt.dart';
 import 'package:email_validator/email_validator.dart';
-import 'package:http/http.dart' as http;
-
-Future<String> postRequest(String email, String? hash) async {
-  var data = {};
-  if (hash == null) {
-    data = <String, String>{'email': email};
-  } else {
-    data = <String, String>{'email': email, 'hash': hash};
-  }
-  http.Response response = await http.post(
-      Uri.parse(
-          'https://upqlg48wn7.execute-api.us-east-1.amazonaws.com/default/StudyHelperBacken'),
-      headers: {'Access-Control-Allow-Origin': '*'},
-      body: jsonEncode(data));
-  if (response.statusCode == 400) {
-    throw response.body;
-  } else if (response.statusCode == 200) {
-    return response.body;
-  } else {
-    throw "what";
-  }
-}
+import 'web_calls.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key, required this.title}) : super(key: key);
