@@ -1,27 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
+import 'package:study_helper_frontend/main.dart';
 import 'elements/input_page_template.dart';
-import 'assignment_list.dart';
-import 'course_list.dart';
+import 'data_storage/course.dart';
+import 'data_storage/assignment.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
 class CreateAssignmentPage extends StatefulWidget {
-  List<Assignment> assignments;
-  List<Course> courses;
-
-  final Function update;
-  final Function getState;
-
-  CreateAssignmentPage(
-      {Key? key,
-      required this.title,
-      required this.assignments,
-      required this.courses,
-      required this.update,
-      required this.getState})
+  const CreateAssignmentPage(
+      {Key? key, required this.title, required this.updateParent})
       : super(key: key);
   final String title;
+  final Function updateParent;
 
   @override
   _CreateAssignmentPageState createState() => _CreateAssignmentPageState();
@@ -40,25 +32,17 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
   void dispose() {
     nameController.dispose();
     courseController.dispose();
+    dateController.dispose();
+    typeController.dispose();
     super.dispose();
   }
 
   String dropdownCourseValue = 'Select course.';
-  String name = "", type = "", course = "";
+  String type = "";
   DateTime date = DateTime.now();
-
-  List<String> populateCourses() {
-    List<String> courseNames = [];
-    for (Course item in widget.getState()["courses"]) {
-      courseNames.add(item.courseName);
-    }
-    return courseNames;
-  }
 
   @override
   Widget build(BuildContext context) {
-    List<String> coursesList = populateCourses();
-    debugPrint(widget.getState().toString());
     return createInputPage(
         [
           TextFormField(
@@ -78,7 +62,9 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
                 });
               },
               // TODO - courses here
-              items: coursesList.map<DropdownMenuItem<String>>((String value) {
+              items: StaticApplicationData.data
+                  .getCourseList()
+                  .map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                     value: value, child: Text(value));
               }).toList(),
@@ -89,8 +75,7 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
           DropdownButtonFormField<String>(
               onChanged: (String? newValue) {
                 setState(() {
-                  type = newValue.toString();
-                  dropdownCourseValue = newValue!;
+                  type = newValue!;
                 });
               },
               items: <String>[
@@ -152,14 +137,16 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
         MainAxisAlignment.start,
         FloatingActionButton(
           onPressed: () {
-            // TODO - actually save
             Assignment assignment = Assignment(
                 name: nameController.text,
-                course: course,
+                course:
+                    StaticApplicationData.data.findCourse(dropdownCourseValue)!,
                 date: DateFormat('MM/dd/yyyy').parse(dateController.text),
                 type: type);
-            widget.update(assignment);
+            StaticApplicationData.data.assignments.add(assignment);
+            GetStorage().write('data', StaticApplicationData.data.toJson());
             Navigator.pop(context);
+            widget.updateParent();
           },
           tooltip: 'Add Assignment',
           child: const Icon(Icons.save),

@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:study_helper_frontend/main.dart';
 import 'elements/drawer.dart';
 import 'create_course.dart';
+import 'main.dart';
 
 class CourseListPage extends StatefulWidget {
   const CourseListPage({Key? key, required this.title}) : super(key: key);
@@ -12,60 +14,13 @@ class CourseListPage extends StatefulWidget {
 }
 
 class _CourseListPageState extends State<CourseListPage> {
-  List<Course> _courses = [];
-
-  final box = GetStorage(); // list of maps stored here
-
-  List storageList = [];
-
-  void storeAndAddCourse(Course course) {
-    _courses.add(course);
-
-    final storageMap = {}; // temp map
-    final index = _courses.length; // unique map keys
-    final courseNameKey = 'courseName$index';
-
-    storageMap[courseNameKey] = course.courseName;
-
-    storageList.add(storageMap);
-
-    box.write('courses', storageList);
-  }
-
-  void restoreCourses() {
-    if (box.hasData('courses')) {
-      storageList = box.read('courses');
-    }
-    String courseNameKey;
-    for (int i = 0; i < storageList.length; i++) {
-      final map = storageList[i];
-      final index = i + 1;
-
-      courseNameKey = 'courseName$index';
-
-      // recreate assignment object
-
-      final course = Course(courseName: map[courseNameKey]);
-
-      _courses.add(course);
-    }
-  }
-
-  void clearAssignments() {
-    _courses.clear();
-    storageList.clear();
-    box.erase();
-  }
-
-  void update(Course course) {
-    storeAndAddCourse(course);
-    setState(() {});
-  }
-
   @override
   void initState() {
     super.initState();
-    restoreCourses();
+  }
+
+  void update() {
+    setState(() {});
   }
 
   @override
@@ -76,9 +31,9 @@ class _CourseListPageState extends State<CourseListPage> {
       ),
       drawer: createDrawer(context, "Courses"),
       body: ListView.builder(
-          itemCount: _courses.length,
+          itemCount: StaticApplicationData.data.courses.length,
           itemBuilder: (context, index) {
-            final item = CourseListItem(_courses[index]);
+            final item = StaticApplicationData.data.courses[index];
             return ListTile(title: item.buildTitle(context));
           }),
       floatingActionButton: FloatingActionButton(
@@ -87,10 +42,7 @@ class _CourseListPageState extends State<CourseListPage> {
               context,
               MaterialPageRoute(
                   builder: (context) => CreateCoursePage(
-                        title: 'Add Course',
-                        courses: _courses,
-                        update: update,
-                      )));
+                      title: 'Add Course', updateParent: update)));
           setState(() {});
         },
         tooltip: 'Add Course',
@@ -98,31 +50,4 @@ class _CourseListPageState extends State<CourseListPage> {
       ),
     );
   }
-}
-
-abstract class ListItem {
-  // title line for list item
-  Widget buildTitle(BuildContext context);
-
-  // subtitle line - can put sub content for assignments?
-  Widget buildSubtitle(BuildContext context);
-}
-
-class Course {
-  final String courseName;
-
-  Course({required this.courseName});
-
-  @override
-  String toString() {
-    return courseName;
-  }
-}
-
-class CourseListItem {
-  Course courseItem;
-
-  CourseListItem(this.courseItem);
-
-  Widget buildTitle(BuildContext context) => Text(courseItem.courseName);
 }

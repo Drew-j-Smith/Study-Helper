@@ -1,27 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:study_helper_frontend/elements/input_page_template.dart';
-import 'course_list.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'data_storage/course.dart';
+import 'package:study_helper_frontend/main.dart';
 
 class CreateCoursePage extends StatefulWidget {
-  List<Course> courses;
-  final Function update;
-
-  CreateCoursePage(
-      {Key? key,
-      required this.title,
-      required this.courses,
-      required this.update})
+  const CreateCoursePage(
+      {Key? key, required this.title, required this.updateParent})
       : super(key: key);
   final String title;
+  final Function updateParent;
   @override
   _CreateCoursePageState createState() => _CreateCoursePageState();
 }
 
 class _CreateCoursePageState extends State<CreateCoursePage> {
-  // TODO - fix this stuff
   final courseNameController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -43,17 +37,17 @@ class _CreateCoursePageState extends State<CreateCoursePage> {
             decoration: const InputDecoration(
                 border: UnderlineInputBorder(), labelText: 'Course Name'),
           ),
-          // TODO - add more fields for courses
         ],
         widget.title,
         _formKey,
         MainAxisAlignment.start,
         FloatingActionButton(
           onPressed: () {
-            // TODO - save actual course
-            Course course = Course(courseName: courseNameController.text);
-            widget.update(course);
+            StaticApplicationData.data.courses
+                .add(Course(name: courseNameController.text));
+            GetStorage().write('data', StaticApplicationData.data.toJson());
             Navigator.pop(context);
+            widget.updateParent();
           },
           tooltip: 'Add Course',
           child: const Icon(Icons.save),

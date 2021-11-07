@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 class Course {
-  String name = "";
+  String name;
 
-  Course({name});
+  Course({this.name = ""});
 
   static Course loadJson(String json) {
     return Course(name: jsonDecode(json)["name"]);

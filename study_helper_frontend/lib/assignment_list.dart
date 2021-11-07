@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:study_helper_frontend/main.dart';
 import 'elements/drawer.dart';
-import 'course_list.dart';
+import 'data_storage/course.dart';
 import 'create_assignment.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -15,83 +16,8 @@ class AssignmentPage extends StatefulWidget {
 }
 
 class _AssignmentPageState extends State<AssignmentPage> {
-  List<Assignment> _assignments = [];
-  List<Course> _courses = [];
-  DateTime lastEvent = DateTime.now();
-
-  final box = GetStorage(); // list of maps stored here
-
-  List storageList = [];
-
-  dynamic getState() {
-    return {
-      "assignments": _assignments,
-      "courses": _courses,
-      "last_update": lastEvent
-    };
-  }
-
-  void storeAndAddAssignment(Assignment assignment) {
-    _assignments.add(assignment);
-
-    final storageMap = {}; // temp map
-    final index = _assignments.length; // unique map keys
-    final nameKey = 'name$index';
-    final courseKey = 'course$index';
-    final dateKey = 'date$index';
-    final typeKey = 'type$index';
-
-    storageMap[nameKey] = assignment.name;
-    storageMap[courseKey] = assignment.course;
-    storageMap[dateKey] = DateFormat('yyyy-MM-dd').format(assignment.date);
-    storageMap[typeKey] = assignment.type;
-
-    storageList.add(storageMap);
-
-    box.write('assignments', storageList);
-  }
-
-  void restoreAssignments() {
-    if (box.hasData('assignments')) {
-      storageList = box.read('assignments');
-    }
-    String nameKey, courseKey, dateKey, typeKey;
-    for (int i = 0; i < storageList.length; i++) {
-      final map = storageList[i];
-      final index = i + 1;
-
-      nameKey = 'name$index';
-      courseKey = 'course$index';
-      dateKey = 'date$index';
-      typeKey = 'type$index';
-
-      // recreate assignment object
-
-      final assignment = Assignment(
-          name: map[nameKey],
-          course: map[courseKey],
-          date: DateFormat('yyyy-MM-dd').parse(map[dateKey]),
-          type: map[typeKey]);
-
-      _assignments.add(assignment);
-    }
-  }
-
-  void clearAssignments() {
-    _assignments.clear();
-    storageList.clear();
-    box.erase();
-  }
-
-  void update(Assignment assignment) {
-    storeAndAddAssignment(assignment);
+  void update() {
     setState(() {});
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    restoreAssignments();
   }
 
   @override
@@ -101,9 +27,9 @@ class _AssignmentPageState extends State<AssignmentPage> {
         title: Text(widget.title),
       ),
       body: ListView.builder(
-          itemCount: _assignments.length,
+          itemCount: StaticApplicationData.data.assignments.length,
           itemBuilder: (context, index) {
-            final item = AssignmentListItem(_assignments[index]);
+            final item = StaticApplicationData.data.assignments[index];
             return ListTile(
               title: item.buildTitle(context),
               subtitle: item.buildSubtitle(context),
@@ -117,10 +43,7 @@ class _AssignmentPageState extends State<AssignmentPage> {
               MaterialPageRoute(
                   builder: (context) => CreateAssignmentPage(
                         title: 'Add Assignment',
-                        assignments: _assignments,
-                        courses: _courses,
-                        update: update,
-                        getState: getState,
+                        updateParent: update,
                       )));
           setState(() {});
         },
@@ -129,29 +52,4 @@ class _AssignmentPageState extends State<AssignmentPage> {
       ),
     );
   }
-}
-
-class Assignment {
-  final String name;
-  final String course;
-  final String type;
-  final DateTime date;
-
-  Assignment(
-      {required this.name,
-      required this.course,
-      required this.date,
-      required this.type});
-}
-
-class AssignmentListItem {
-  Assignment item;
-  final DateFormat formatter = DateFormat('MM-dd-yy');
-
-  AssignmentListItem(this.item);
-
-  Widget buildTitle(BuildContext context) => Text(item.name);
-
-  Widget buildSubtitle(BuildContext context) =>
-      Text(item.course + " " + item.type + " " + formatter.format(item.date));
 }

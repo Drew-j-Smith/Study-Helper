@@ -4,11 +4,14 @@ import 'assignment.dart';
 import 'course.dart';
 
 class ApplicationData {
-  List<Course> courses = [];
-  List<Assignment> assignments = [];
-  DateTime lastEdit = DateTime(2000);
+  List<Course> courses;
+  List<Assignment> assignments;
+  DateTime lastEdit;
 
-  ApplicationData({courses, assignments, lastEdit});
+  ApplicationData(
+      {required this.courses,
+      required this.assignments,
+      required this.lastEdit});
 
   static ApplicationData loadJson(String json) {
     var decodedJson = jsonDecode(json);
@@ -25,7 +28,7 @@ class ApplicationData {
     return ApplicationData(
         courses: courses,
         assignments: assignments,
-        lastEdit: DateTime.parse(decodedJson["dueTime"]));
+        lastEdit: DateTime.parse(decodedJson["lastEdit"]));
   }
 
   String toJson() {
@@ -38,9 +41,26 @@ class ApplicationData {
       assignmentJson.add(a.toJson());
     }
     return jsonEncode({
-      "courses": jsonEncode(courseJson),
-      "assignments": jsonEncode(assignmentJson),
+      "courses": courseJson,
+      "assignments": assignmentJson,
       "lastEdit": lastEdit.toIso8601String()
     });
+  }
+
+  List<String> getCourseList() {
+    List<String> courseList = [];
+    for (Course c in courses) {
+      courseList.add(c.name);
+    }
+    return courseList;
+  }
+
+  Course? findCourse(String name) {
+    for (Course c in courses) {
+      if (c.name == name) {
+        return c;
+      }
+    }
+    return null;
   }
 }
