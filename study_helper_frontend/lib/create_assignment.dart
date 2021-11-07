@@ -57,7 +57,7 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
   @override
   Widget build(BuildContext context) {
     List<String> coursesList = populateCourses();
-    debugPrint(widget.getState());
+    debugPrint(widget.getState().toString());
     return Scaffold(
         appBar: AppBar(title: Text(widget.title)),
         body: Center(
