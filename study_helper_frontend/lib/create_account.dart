@@ -5,7 +5,8 @@ import 'package:crypt/crypt.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:http/http.dart' as http;
 
-Future putRequest(String email, String hash, String salt, String data) async {
+Future<String> putRequest(
+    String email, String hash, String salt, String data) async {
   http.Response response = await http.put(
       Uri.parse(
           'https://upqlg48wn7.execute-api.us-east-1.amazonaws.com/default/StudyHelperBacken'),
@@ -23,6 +24,7 @@ Future putRequest(String email, String hash, String salt, String data) async {
   } else {
     // what
   }
+  return "";
 }
 
 class CreateAccountPage extends StatefulWidget {
@@ -110,15 +112,18 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                 padding: const EdgeInsets.all(20),
                                 child: Center(
                                     child: ElevatedButton(
-                                        onPressed: () {
+                                        onPressed: () async {
                                           if (_formKey.currentState!
                                               .validate()) {
                                             final hash = Crypt.sha256(
                                                 passController.text);
                                             debugPrint(hash.hash);
                                             debugPrint(hash.salt);
-                                            putRequest(emailController.text,
-                                                hash.hash, hash.salt, '');
+                                            await putRequest(
+                                                emailController.text,
+                                                hash.hash,
+                                                hash.salt,
+                                                '');
                                           }
                                         },
                                         child: const Text(

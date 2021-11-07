@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'course_list.dart';
 import 'login.dart';
 import 'create_account.dart';
 import 'create_assignment.dart';
@@ -130,6 +131,14 @@ class _AssignmentPageState extends State<AssignmentPage> {
             },
           ),
           ListTile(
+            title: const Text('Courses'),
+            onTap: () {
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) =>
+                      const CourseListPage(title: 'Courses')));
+            },
+          ),
+          ListTile(
               title: const Text('Login'),
               onTap: () {
                 Navigator.push(
@@ -160,7 +169,7 @@ class _AssignmentPageState extends State<AssignmentPage> {
           addAndStoreAssignment(assignment);
           setState(() {});
         },
-        tooltip: 'Add Homework',
+        tooltip: 'Add Assignment',
         child: const Icon(Icons.add),
       ),
     );

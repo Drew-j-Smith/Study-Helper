@@ -11,6 +11,7 @@ class CreateAssignmentPage extends StatefulWidget {
 }
 
 class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
+  // TODO - fix this stuff
   final nameController = TextEditingController();
   final courseController = TextEditingController();
   final dateController = TextEditingController();
@@ -25,7 +26,6 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
   }
 
   String dropdownCourseValue = 'Select course.';
-  DateTime dropdownDateValue = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -45,17 +45,22 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           TextFormField(
-                            autocorrect: false,
-                            decoration: const InputDecoration(
-                                border: UnderlineInputBorder(),
-                                labelText: 'Assignment Name'),
-                          ),
+                              autocorrect: false,
+                              decoration: const InputDecoration(
+                                  border: UnderlineInputBorder(),
+                                  labelText: 'Assignment Name'),
+                              validator: (String? value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Assignment name can not be empty.';
+                                }
+                              }),
                           DropdownButtonFormField<String>(
                               onChanged: (String? newValue) {
                                 setState(() {
                                   dropdownCourseValue = newValue!;
                                 });
                               },
+                              // TODO - courses here
                               items: <String>[
                                 'thing1',
                                 'thing2'
@@ -66,6 +71,29 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
                               decoration: const InputDecoration(
                                 border: UnderlineInputBorder(),
                                 labelText: 'Course',
+                              )),
+                          DropdownButtonFormField<String>(
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  dropdownCourseValue = newValue!;
+                                });
+                              },
+                              items: <String>[
+                                'Homework',
+                                'Project',
+                                'Reading',
+                                'Lab',
+                                'Quiz',
+                                'Test',
+                                'Midterm',
+                                'Final'
+                              ].map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                    value: value, child: Text(value));
+                              }).toList(),
+                              decoration: const InputDecoration(
+                                border: UnderlineInputBorder(),
+                                labelText: 'Type',
                               )),
                           DateTimeField(
                             format: DateFormat('MM/dd/yyyy'),
@@ -80,9 +108,39 @@ class _CreateAssignmentPageState extends State<CreateAssignmentPage> {
                                   firstDate: DateTime(2001),
                                   lastDate: DateTime(2099));
                             },
+                            validator: (DateTime? value) {
+                              if (value == null) {
+                                return 'Must enter date.';
+                              }
+                              return null;
+                            },
+                          ),
+                          DateTimeField(
+                            format: DateFormat('hh:mm a'),
+                            decoration: const InputDecoration(
+                              border: UnderlineInputBorder(),
+                              labelText: 'Due Time',
+                            ),
+                            onShowPicker: (context, currentValue) async {
+                              final TimeOfDay? time = await showTimePicker(
+                                  context: context,
+                                  initialTime: TimeOfDay.fromDateTime(
+                                      currentValue ?? DateTime.now()));
+                              return time == null
+                                  ? null
+                                  : DateTimeField.convert(time);
+                            },
                           )
                         ],
                       ),
-                    ))))));
+                    ))))),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            // TODO - actually save
+            Navigator.pop(context);
+          },
+          tooltip: 'Add Assignment',
+          child: const Icon(Icons.save),
+        ));
   }
 }
