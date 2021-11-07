@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../course_list.dart';
 import '../create_account.dart';
 import '../login.dart';
-import '../main.dart';
+import '../assignment_list.dart';
 
 Drawer createDrawer(BuildContext context, String currentPage) {
   return Drawer(

@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'elements/input_page_template.dart';
-import 'main.dart';
+import 'assignment_list.dart';
 import 'course_list.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 

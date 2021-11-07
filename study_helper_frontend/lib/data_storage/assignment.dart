@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
 import 'course.dart';
 
 class Assignment {
@@ -7,6 +10,7 @@ class Assignment {
   Course course = Course();
   String type = "";
   DateTime dueTime = DateTime(2000);
+  final DateFormat formatter = DateFormat('MM-dd-yy');
 
   Assignment({name, course, type, dueTime});
 
@@ -27,4 +31,9 @@ class Assignment {
       "dueTime": dueTime.toIso8601String()
     });
   }
+
+  Widget buildTitle(BuildContext context) => Text(name);
+
+  Widget buildSubtitle(BuildContext context) =>
+      Text(course.name + " " + type + " " + formatter.format(dueTime));
 }
