@@ -1,11 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'elements/drawer.dart';
 import 'create_course.dart';
-import 'main.dart';
-import 'login.dart';
-import 'create_account.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
 class CourseListPage extends StatefulWidget {
   const CourseListPage({Key? key, required this.title}) : super(key: key);
@@ -77,46 +74,7 @@ class _CourseListPageState extends State<CourseListPage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      drawer: Drawer(
-        child: ListView(padding: EdgeInsets.zero, children: [
-          const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.purple),
-              child: Center(
-                  child: Text('Study Helper',
-                      style: TextStyle(fontSize: 40, color: Colors.white)))),
-          ListTile(
-            title: const Text('Homework'),
-            onTap: () {
-              Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (context) =>
-                      const AssignmentPage(title: 'Homework')));
-            },
-          ),
-          ListTile(
-            title: const Text('Courses'),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-              title: const Text('Login'),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const LoginPage(title: 'Login')));
-              }),
-          ListTile(
-              title: const Text('Create Account'),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            const CreateAccountPage(title: 'Create Account')));
-              }),
-        ]),
-      ),
+      drawer: createDrawer(context, "Courses"),
       body: ListView.builder(
           itemCount: _courses.length,
           itemBuilder: (context, index) {

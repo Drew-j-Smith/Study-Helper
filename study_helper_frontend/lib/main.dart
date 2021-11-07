@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'elements/drawer.dart';
 import 'course_list.dart';
-import 'login.dart';
-import 'create_account.dart';
 import 'create_assignment.dart';
 import 'package:get_storage/get_storage.dart';
 
@@ -132,47 +131,7 @@ class _AssignmentPageState extends State<AssignmentPage> {
               subtitle: item.buildSubtitle(context),
             );
           }),
-      drawer: Drawer(
-        child: ListView(padding: EdgeInsets.zero, children: [
-          const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.purple),
-              child: Center(
-                  child: Text('Study Helper',
-                      style: TextStyle(fontSize: 40, color: Colors.white)))),
-          ListTile(
-            title: const Text('Homework'),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            title: const Text('Courses'),
-            onTap: () {
-              Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (context) =>
-                      const CourseListPage(title: 'Courses')));
-            },
-          ),
-          ListTile(
-              title: const Text('Login'),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const LoginPage(title: 'Login')));
-              }),
-          ListTile(
-              title: const Text('Create Account'),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            const CreateAccountPage(title: 'Create Account')));
-              }),
-          ListTile(title: const Text('Sync'), onTap: () {}),
-        ]),
-      ),
+      drawer: createDrawer(context, "Homework"),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(

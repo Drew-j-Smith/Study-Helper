@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'elements/email_text_form_field.dart';
 import 'elements/password_text_form_field.dart';
-import 'elements/login_page_template.dart';
+import 'elements/input_page_template.dart';
 import 'elements/create_account_button.dart';
 
 class CreateAccountPage extends StatefulWidget {
@@ -28,7 +28,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
   @override
   Widget build(BuildContext context) {
-    return createLoginPage([
+    return createInputPage([
       createEmailTextFormField(emailController),
       createPasswordTextFormField(passController, "Enter your password",
           (String? value) {
@@ -45,6 +45,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         return null;
       }),
       createAcountButton(_formKey, emailController, passController)
-    ], widget.title, _formKey);
+    ], widget.title, _formKey, MainAxisAlignment.center, null, 500);
   }
 }

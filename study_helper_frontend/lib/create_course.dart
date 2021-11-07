@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:study_helper_frontend/elements/input_page_template.dart';
 import 'course_list.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 
@@ -34,33 +35,20 @@ class _CreateCoursePageState extends State<CreateCoursePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(title: Text(widget.title)),
-        body: Center(
-            child: SizedBox(
-                width: 700,
-                child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-                    child: Center(
-                        child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          TextFormField(
-                            controller: courseNameController,
-                            autocorrect: false,
-                            decoration: const InputDecoration(
-                                border: UnderlineInputBorder(),
-                                labelText: 'Course Name'),
-                          ),
-                          // TODO - add more fields for courses
-                        ],
-                      ),
-                    ))))),
-        floatingActionButton: FloatingActionButton(
+    return createInputPage(
+        [
+          TextFormField(
+            controller: courseNameController,
+            autocorrect: false,
+            decoration: const InputDecoration(
+                border: UnderlineInputBorder(), labelText: 'Course Name'),
+          ),
+          // TODO - add more fields for courses
+        ],
+        widget.title,
+        _formKey,
+        MainAxisAlignment.start,
+        FloatingActionButton(
           onPressed: () {
             // TODO - save actual course
             Course course = Course(courseName: courseNameController.text);
@@ -69,6 +57,7 @@ class _CreateCoursePageState extends State<CreateCoursePage> {
           },
           tooltip: 'Add Course',
           child: const Icon(Icons.save),
-        ));
+        ),
+        700);
   }
 }
